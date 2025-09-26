@@ -1,0 +1,64 @@
+import React from "react";
+import Dashboard from "./pages/Dashboard";
+import Signup from "./pages/Signup";
+import LoginPage from "./pages/LoginPage";
+import {
+  BrowserRouter as Router,
+  Route,
+  Routes,
+  Navigate,
+} from "react-router-dom";
+import ProtectedRoutes from "./hooks/ProtectedRoutes.jsx";
+import AdminDashboard from "./Admin/AdminDashboard.jsx";
+import AdminUser from "./Admin/AdminUser.jsx";
+import AdminTask from "./Admin/AdminTask.jsx";
+
+const App = () => {
+  return (
+    <Router>
+      <Routes>
+        <Route path="/" element={<Navigate to="/login" />} />
+        <Route path="/login" element={<LoginPage />} />
+        <Route path="/signup" element={<Signup />} />
+
+        <Route
+          path="/dashboard"
+          element={
+            <ProtectedRoutes>
+              <Dashboard />
+            </ProtectedRoutes>
+          }
+        />
+
+        <Route
+          path="/admin"
+          element={
+            <ProtectedRoutes role="admin">
+              <AdminDashboard />
+            </ProtectedRoutes>
+          }
+        />
+
+        <Route
+          path="/admin-tasks"
+          element={
+            <ProtectedRoutes role="admin">
+              <AdminTask />
+            </ProtectedRoutes>
+          }
+        />
+
+        <Route
+          path="/admin-users"
+          element={
+            <ProtectedRoutes role="admin">
+              <AdminUser />
+            </ProtectedRoutes>
+          }
+        />
+      </Routes>
+    </Router>
+  );
+};
+
+export default App;
