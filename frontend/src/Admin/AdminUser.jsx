@@ -58,15 +58,11 @@ const AdminUser = () => {
   return (
     <div className="flex flex-col min-h-screen">
       <Toaster />
-      {/* Top Navbar */}
       <Navbar />
 
-      {/* Sidebar + Main Content */}
       <div className="flex flex-1">
-        {/* Sidebar on the left */}
         <Sidebar />
 
-        {/* Main Content Area */}
         <main className="flex-1 p-6 bg-gray-100">
           <div className="mb-4">
             <Search onSearch={handleSearch} />

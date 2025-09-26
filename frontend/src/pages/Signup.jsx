@@ -21,6 +21,9 @@ const Signup = () => {
     try {
       let res = await authAPI.post("/signup", signupData);
       localStorage.setItem("token", res.data.token);
+      localStorage.setItem("user", JSON.stringify(res.data.user));
+      console.log("Token:", res.data.token);
+      console.log("User:", res.data.user);
 
       toast.success("Signup Successful");
       navigate("/dashboard", { replace: true });
