@@ -25,7 +25,7 @@ const Dashboard = () => {
 
   const handleSearch = (query) => {
     setSearch(query);
-    setPage(1);
+    // setPage(1);
   };
 
   return (

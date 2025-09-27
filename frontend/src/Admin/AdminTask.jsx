@@ -8,18 +8,25 @@ import toast, { Toaster } from "react-hot-toast";
 
 const AdminTask = () => {
   const [tasks, setTasks] = useState([]);
+  const [page, setPage] = useState(1);
+  const [limit, setLimit] = useState(10);
+  const [totalPages, setTotalPages] = useState(1);
   const [search, setSearch] = useState("");
 
   useEffect(() => {
     fetchTasks();
-  }, [search]);
+  }, [search, page, limit]);
 
   const fetchTasks = async () => {
     try {
-      const response = await axiosInstance.get(`/tasks?search=${search}`);
-      setTasks(response.data);
+      const response = await axiosInstance.get(
+        `/tasks?search=${search}&page=${page}&limit=${limit}`
+      );
+      setTasks(response.data.tasks);
+      setTotalPages(response.data.totalPages || 1);
     } catch (error) {
       console.error("Error fetching tasks:", error);
+      setTasks([]);
     }
   };
 
@@ -30,18 +37,22 @@ const AdminTask = () => {
   const handleEditTask = async (updatedTask) => {
     try {
       await axiosInstance.put(`/tasks/${updatedTask._id}`, updatedTask);
-      fetchTasks(); // Refresh data
+      fetchTasks();
       toast.success("Task updated successfully");
     } catch (error) {
       console.error("Error updating task:", error);
-      toast.error("Failed to update task");
+      toast.error("Task Update Failed");
     }
   };
 
   const handleDeleteTask = async (taskId) => {
     try {
       await axiosInstance.delete(`/tasks/${taskId}`);
-      fetchTasks(); // Refresh data
+      if (tasks.length === 1 && page > 1) {
+        setPage((prev) => prev - 1);
+      } else {
+        fetchTasks();
+      }
       toast.success("Task deleted successfully");
     } catch (error) {
       console.error("Error deleting task:", error);
@@ -63,15 +74,9 @@ const AdminTask = () => {
   return (
     <div className="flex flex-col min-h-screen">
       <Toaster />
-      {/* Top Navbar */}
       <Navbar />
-
-      {/* Sidebar + Main Content */}
       <div className="flex flex-1">
-        {/* Sidebar on the left */}
         <Sidebar />
-
-        {/* Main Content Area */}
         <main className="flex-1 p-6 bg-gray-100">
           <div className="mb-4">
             <Search onSearch={handleSearch} />
@@ -80,6 +85,11 @@ const AdminTask = () => {
             title="Tasks"
             columns={taskColumns}
             data={tasks}
+            totalPages={totalPages}
+            page={page}
+            setPage={setPage}
+            limit={limit}
+            setLimit={setLimit}
             onEdit={handleEditTask}
             onDelete={handleDeleteTask}
           />

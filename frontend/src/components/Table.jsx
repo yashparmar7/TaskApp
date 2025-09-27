@@ -28,16 +28,23 @@ const Table = ({
 
   useEffect(() => {
     setPage(1);
-  }, [limit, setPage]);
+  }, [limit]);
 
   const handleDeleteTask = async (taskId) => {
     try {
       const token = localStorage.getItem("token");
       if (!token) return;
+
       await taskAPI.delete(`/deleteTask/${taskId}`, {
         headers: { Authorization: `Bearer ${token}` },
       });
-      await fetchTasks();
+
+      if (tasks.length === 1 && page > 1) {
+        setPage((prev) => prev - 1);
+      } else {
+        await fetchTasks();
+      }
+
       toast.success("Task deleted successfully");
     } catch (err) {
       console.error("Error deleting task:", err);
@@ -104,6 +111,7 @@ const Table = ({
       )}
 
       <div className="flex flex-col sm:flex-row justify-between items-center mt-4 gap-2">
+        {/* Rows per page selector */}
         <div className="flex items-center gap-2">
           <label className="font-medium text-gray-700">Rows per page:</label>
           <select
@@ -118,11 +126,12 @@ const Table = ({
           </select>
         </div>
 
+        {/* Pagination controls */}
         <div className="flex items-center gap-3">
           <button
             onClick={() => setPage((prev) => Math.max(prev - 1, 1))}
             disabled={page === 1}
-            className="px-3 py-1 border rounded bg-gray-500 hover:bg-gray-600 text-white"
+            className="px-3 py-1 border rounded bg-gray-500 hover:bg-gray-600 text-white disabled:opacity-50"
           >
             Prev
           </button>
@@ -132,7 +141,7 @@ const Table = ({
           <button
             onClick={() => setPage((prev) => Math.min(prev + 1, totalPages))}
             disabled={page === totalPages}
-            className="px-3 py-1 border rounded bg-gray-500 hover:bg-gray-600 text-white "
+            className="px-3 py-1 border rounded bg-gray-500 hover:bg-gray-600 text-white disabled:opacity-50"
           >
             Next
           </button>

@@ -32,6 +32,7 @@ const handleTaskDisplay = async (req, res) => {
         $or: [
           { title: { $regex: search, $options: "i" } },
           { description: { $regex: search, $options: "i" } },
+          { status: { $regex: search, $options: "i" } },
         ],
       };
     }

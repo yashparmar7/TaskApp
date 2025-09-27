@@ -18,8 +18,8 @@ const Cards = () => {
         axiosInstance.get("/tasks"),
       ]);
       setDashboardData([
-        { id: 1, title: "Total Users", count: usersRes.data.length },
-        { id: 2, title: "Total Tasks", count: tasksRes.data.length },
+        { id: 1, title: "Total Users", count: usersRes.data.totalUsers },
+        { id: 2, title: "Total Tasks", count: tasksRes.data.totalTasks },
       ]);
     } catch (error) {
       console.error("Error fetching counts:", error);

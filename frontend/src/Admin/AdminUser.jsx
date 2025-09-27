@@ -8,18 +8,25 @@ import toast, { Toaster } from "react-hot-toast";
 
 const AdminUser = () => {
   const [users, setUsers] = useState([]);
+  const [page, setPage] = useState(1);
+  const [limit, setLimit] = useState(10);
+  const [totalPages, setTotalPages] = useState(1);
   const [search, setSearch] = useState("");
 
   useEffect(() => {
     fetchUsers();
-  }, [search]);
+  }, [search, page, limit]);
 
   const fetchUsers = async () => {
     try {
-      const response = await axiosInstance.get(`/users?search=${search}`);
-      setUsers(response.data);
+      const response = await axiosInstance.get(
+        `/users?search=${search}&page=${page}&limit=${limit}`
+      );
+      setUsers(response.data.users);
+      setTotalPages(response.data.totalPages || 1);
     } catch (error) {
       console.error("Error fetching users:", error);
+      setUsers([]);
     }
   };
 
@@ -30,7 +37,7 @@ const AdminUser = () => {
   const handleEditUser = async (updatedUser) => {
     try {
       await axiosInstance.put(`/users/${updatedUser._id}`, updatedUser);
-      fetchUsers(); // Refresh data
+      fetchUsers();
       toast.success("User updated successfully");
     } catch (error) {
       console.error("Error updating user:", error);
@@ -41,7 +48,11 @@ const AdminUser = () => {
   const handleDeleteUser = async (userId) => {
     try {
       await axiosInstance.delete(`/users/${userId}`);
-      fetchUsers(); // Refresh data
+      if (users.length === 1 && page > 1) {
+        setPage((prev) => prev - 1);
+      } else {
+        fetchUsers();
+      }
       toast.success("User deleted successfully");
     } catch (error) {
       console.error("Error deleting user:", error);
@@ -59,10 +70,8 @@ const AdminUser = () => {
     <div className="flex flex-col min-h-screen">
       <Toaster />
       <Navbar />
-
       <div className="flex flex-1">
         <Sidebar />
-
         <main className="flex-1 p-6 bg-gray-100">
           <div className="mb-4">
             <Search onSearch={handleSearch} />
@@ -71,6 +80,11 @@ const AdminUser = () => {
             title="Users"
             columns={userColumns}
             data={users}
+            totalPages={totalPages}
+            page={page}
+            setPage={setPage}
+            limit={limit}
+            setLimit={setLimit}
             onEdit={handleEditUser}
             onDelete={handleDeleteUser}
           />
