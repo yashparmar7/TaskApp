@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import Navbar from "../components/Navbar";
 import { Toaster } from "react-hot-toast";
 import { CirclePlus } from "lucide-react";
@@ -25,8 +25,10 @@ const Dashboard = () => {
 
   const handleSearch = (query) => {
     setSearch(query);
-    // setPage(1);
   };
+  useEffect(() => {
+    setPage(1);
+  }, [search]);
 
   return (
     <div className="dashboard">

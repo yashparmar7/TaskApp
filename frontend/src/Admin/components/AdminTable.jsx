@@ -12,6 +12,7 @@ const AdminTable = ({
   setPage,
   limit,
   setLimit,
+  usersList = [], // 👈 new prop for all users
 }) => {
   const [editingId, setEditingId] = useState(null);
   const [editData, setEditData] = useState({});
@@ -33,6 +34,11 @@ const AdminTable = ({
 
   const handleInputChange = (e, field) => {
     setEditData({ ...editData, [field]: e.target.value });
+  };
+
+  const getUsernameById = (id) => {
+    const user = usersList.find((u) => u._id === id);
+    return user ? user.username : "N/A";
   };
 
   useEffect(() => {
@@ -64,12 +70,27 @@ const AdminTable = ({
                   <td key={col.key} className="border px-4 py-2">
                     {editingId === item._id ? (
                       col.key === "user" ? (
-                        <input
-                          type="text"
-                          value={editData.user?.username || "N/A"}
-                          disabled
-                          className="w-full p-2 border rounded bg-gray-100"
-                        />
+                        <select
+                          value={editData.user?._id || ""}
+                          onChange={(e) =>
+                            setEditData({
+                              ...editData,
+
+                              user: {
+                                _id: e.target.value,
+                                username: getUsernameById(e.target.value),
+                              },
+                            })
+                          }
+                          className="w-full p-2 border rounded"
+                        >
+                          <option value="">Select User</option>
+                          {usersList.map((u) => (
+                            <option key={u._id} value={u._id}>
+                              {u.username}
+                            </option>
+                          ))}
+                        </select>
                       ) : (
                         <input
                           type="text"
@@ -80,6 +101,8 @@ const AdminTable = ({
                       )
                     ) : col.render ? (
                       col.render(item)
+                    ) : col.key === "user" ? (
+                      item.user?.username || "N/A"
                     ) : (
                       item[col.key]
                     )}
@@ -90,13 +113,13 @@ const AdminTable = ({
                     <>
                       <button
                         onClick={handleSave}
-                        className="bg-gray-500 text-white px-2 py-1 rounded mr-2"
+                        className="bg-gray-500 text-white px-5 py-1 rounded mr-2"
                       >
                         Save
                       </button>
                       <button
                         onClick={handleCancel}
-                        className="bg-white text-gray-500 border border-gray-500 px-2 py-1 rounded"
+                        className="bg-white text-gray-500 border border-gray-500 px-4 py-1 rounded"
                       >
                         Cancel
                       </button>
@@ -148,7 +171,7 @@ const AdminTable = ({
           <button
             onClick={() => setPage((prev) => Math.max(prev - 1, 1))}
             disabled={page === 1}
-            className="px-3 py-1 border rounded bg-gray-500 hover:bg-gray-600 text-white disabled:opacity-50"
+            className="px-3 py-1 border rounded bg-gray-500 hover:bg-gray-600 text-white disabled:opacity-80"
           >
             Prev
           </button>
@@ -158,7 +181,7 @@ const AdminTable = ({
           <button
             onClick={() => setPage((prev) => Math.min(prev + 1, totalPages))}
             disabled={page === totalPages}
-            className="px-3 py-1 border rounded bg-gray-500 hover:bg-gray-600 text-white disabled:opacity-50"
+            className="px-3 py-1 border rounded bg-gray-500 hover:bg-gray-600 text-white disabled:opacity-80"
           >
             Next
           </button>

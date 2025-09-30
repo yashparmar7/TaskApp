@@ -8,7 +8,7 @@ import {
   Routes,
   Navigate,
 } from "react-router-dom";
-import ProtectedRoutes from "./hooks/ProtectedRoutes.jsx";
+import ProtectedRoutes from "./protectRoutes/ProtectedRoutes.jsx";
 import AdminDashboard from "./Admin/AdminDashboard.jsx";
 import AdminUser from "./Admin/AdminUser.jsx";
 import AdminTask from "./Admin/AdminTask.jsx";

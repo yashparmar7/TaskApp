@@ -76,7 +76,9 @@ const AdminTask = () => {
       <Toaster />
       <Navbar />
       <div className="flex flex-1">
-        <Sidebar />
+        <aside className="w-64 h-screen sticky top-0 bg-white shadow">
+          <Sidebar />
+        </aside>
         <main className="flex-1 p-6 bg-gray-100">
           <div className="mb-4">
             <Search onSearch={handleSearch} />
@@ -92,6 +94,7 @@ const AdminTask = () => {
             setLimit={setLimit}
             onEdit={handleEditTask}
             onDelete={handleDeleteTask}
+            usersList={tasks.map((task) => task.username || "N/A")}
           />
         </main>
       </div>
