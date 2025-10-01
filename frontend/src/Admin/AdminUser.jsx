@@ -12,18 +12,35 @@ const AdminUser = () => {
   const [limit, setLimit] = useState(10);
   const [totalPages, setTotalPages] = useState(1);
   const [search, setSearch] = useState("");
+  const [cache, setCache] = useState({});
 
   useEffect(() => {
     fetchUsers();
   }, [search, page, limit]);
 
   const fetchUsers = async () => {
+    const cacheKey = `${page}-${limit}-${search}`;
+
+    if (cache[cacheKey]) {
+      setUsers(cache[cacheKey].users);
+      setTotalPages(cache[cacheKey].totalPages);
+      return;
+    }
+
     try {
       const response = await axiosInstance.get(
         `/users?search=${search}&page=${page}&limit=${limit}`
       );
       setUsers(response.data.users);
       setTotalPages(response.data.totalPages || 1);
+
+      setCache((prev) => ({
+        ...prev,
+        [cacheKey]: {
+          users: response.data.users,
+          totalPages: response.data.totalPages || 1,
+        },
+      }));
     } catch (error) {
       console.error("Error fetching users:", error);
       setUsers([]);
@@ -33,6 +50,9 @@ const AdminUser = () => {
   const handleSearch = (query) => {
     setSearch(query);
   };
+  useEffect(() => {
+    setPage(1);
+  }, [search]);
 
   const handleEditUser = async (updatedUser) => {
     try {

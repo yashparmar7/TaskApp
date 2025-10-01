@@ -12,18 +12,41 @@ const AdminTask = () => {
   const [limit, setLimit] = useState(10);
   const [totalPages, setTotalPages] = useState(1);
   const [search, setSearch] = useState("");
+  const [cache, setCache] = useState({});
 
   useEffect(() => {
     fetchTasks();
   }, [search, page, limit]);
 
   const fetchTasks = async () => {
+    const cacheKey = `${page}-${limit}-${search}`;
+    console.log("Cache Key:", cacheKey);
+
+    if (cache[cacheKey]) {
+      setTasks(cache[cacheKey].tasks);
+      setTotalPages(cache[cacheKey].totalPages);
+      return;
+    }
+
     try {
       const response = await axiosInstance.get(
         `/tasks?search=${search}&page=${page}&limit=${limit}`
       );
-      setTasks(response.data.tasks);
+
+      const fetchedTasks = Array.isArray(response.data.tasks)
+        ? response.data.tasks
+        : [];
+
+      setTasks(fetchedTasks);
       setTotalPages(response.data.totalPages || 1);
+
+      setCache((prev) => ({
+        ...prev,
+        [cacheKey]: {
+          tasks: fetchedTasks,
+          totalPages: response.data.totalPages || 1,
+        },
+      }));
     } catch (error) {
       console.error("Error fetching tasks:", error);
       setTasks([]);
@@ -33,6 +56,9 @@ const AdminTask = () => {
   const handleSearch = (query) => {
     setSearch(query);
   };
+  useEffect(() => {
+    setPage(1);
+  }, [search]);
 
   const handleEditTask = async (updatedTask) => {
     try {
@@ -94,7 +120,7 @@ const AdminTask = () => {
             setLimit={setLimit}
             onEdit={handleEditTask}
             onDelete={handleDeleteTask}
-            usersList={tasks.map((task) => task.username || "N/A")}
+            usersList={tasks.map((task) => task.user)}
           />
         </main>
       </div>

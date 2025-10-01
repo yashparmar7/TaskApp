@@ -12,7 +12,7 @@ const AdminTable = ({
   setPage,
   limit,
   setLimit,
-  usersList = [], // 👈 new prop for all users
+  usersList = [],
 }) => {
   const [editingId, setEditingId] = useState(null);
   const [editData, setEditData] = useState({});

@@ -4,30 +4,54 @@ import { taskAPI } from "../lib/axiosInstance";
 const usePaginatedTasks = (page, limit, search = "") => {
   const [tasks, setTasks] = useState([]);
   const [totalPages, setTotalPages] = useState(1);
+  const [cache, setCache] = useState({});
 
-  const fetchTasks = useCallback(async () => {
-    try {
-      const token = localStorage.getItem("token");
-      if (!token) return;
+  const fetchTasks = useCallback(
+    async (force = false) => {
+      try {
+        const token = localStorage.getItem("token");
+        if (!token) return;
 
-      const res = await taskAPI.get(
-        `/getTasks?page=${page}&limit=${limit}&search=${search}`,
-        {
-          headers: { Authorization: `Bearer ${token}` },
+        const cacheKey = `${page}-${limit}-${search}`;
+
+        if (!force && cache[cacheKey]) {
+          setTasks(cache[cacheKey].tasks);
+          setTotalPages(cache[cacheKey].totalPages);
+          return;
         }
-      );
 
-      setTasks(Array.isArray(res.data.tasks) ? res.data.tasks : []);
-      setTotalPages(res.data.totalPages || 1);
-    } catch (err) {
-      console.error("Error fetching tasks:", err);
-      setTasks([]);
-    }
-  }, [page, limit, search]);
+        const res = await taskAPI.get(
+          `/getTasks?page=${page}&limit=${limit}&search=${search}`,
+          {
+            headers: { Authorization: `Bearer ${token}` },
+          }
+        );
+
+        const fetchedTasks = Array.isArray(res.data.tasks)
+          ? res.data.tasks
+          : [];
+
+        setTasks(fetchedTasks);
+        setTotalPages(res.data.totalPages || 1);
+
+        setCache((prev) => ({
+          ...prev,
+          [cacheKey]: {
+            tasks: fetchedTasks,
+            totalPages: res.data.totalPages || 1,
+          },
+        }));
+      } catch (err) {
+        console.error("Error fetching tasks:", err);
+        setTasks([]);
+      }
+    },
+    [page, limit, search, cache]
+  );
 
   useEffect(() => {
     fetchTasks();
-  }, [fetchTasks]);
+  }, [page, limit, search, fetchTasks]);
 
   return { tasks, totalPages, fetchTasks };
 };
