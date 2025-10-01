@@ -20,7 +20,8 @@ const AdminTask = () => {
 
   const fetchTasks = async () => {
     const cacheKey = `${page}-${limit}-${search}`;
-    console.log("Cache Key:", cacheKey);
+
+    console.log(cacheKey);
 
     if (cache[cacheKey]) {
       setTasks(cache[cacheKey].tasks);
@@ -36,6 +37,8 @@ const AdminTask = () => {
       const fetchedTasks = Array.isArray(response.data.tasks)
         ? response.data.tasks
         : [];
+
+      // console.log(fetchedTasks);
 
       setTasks(fetchedTasks);
       setTotalPages(response.data.totalPages || 1);
@@ -120,7 +123,7 @@ const AdminTask = () => {
             setLimit={setLimit}
             onEdit={handleEditTask}
             onDelete={handleDeleteTask}
-            usersList={tasks.map((task) => task.user)}
+            usersList={tasks.map((task) => task.user)} 
           />
         </main>
       </div>

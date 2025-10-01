@@ -87,9 +87,11 @@ const getAllTasks = async (req, res) => {
     limit = parseInt(limit) || 10;
     const skip = (page - 1) * limit;
 
-    let query = {};
+    let query = { isDeleted: { $ne: true } };
     if (search) {
       query = {
+        user: req.user._id,
+        isDeleted: { $ne: true },
         $or: [
           { title: { $regex: search, $options: "i" } },
           { description: { $regex: search, $options: "i" } },

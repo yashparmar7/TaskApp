@@ -109,6 +109,7 @@ const AdminUser = () => {
             setLimit={setLimit}
             onEdit={handleEditUser}
             onDelete={handleDeleteUser}
+            usersList={[]}
           />
         </main>
       </div>

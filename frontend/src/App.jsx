@@ -12,6 +12,8 @@ import ProtectedRoutes from "./protectRoutes/ProtectedRoutes.jsx";
 import AdminDashboard from "./Admin/AdminDashboard.jsx";
 import AdminUser from "./Admin/AdminUser.jsx";
 import AdminTask from "./Admin/AdminTask.jsx";
+import { Settings } from "lucide-react";
+import AdminSettings from "./Admin/AdminSettings.jsx";
 
 const App = () => {
   return (
@@ -53,6 +55,14 @@ const App = () => {
           element={
             <ProtectedRoutes role="admin">
               <AdminUser />
+            </ProtectedRoutes>
+          }
+        />
+        <Route
+          path="/admin-settings"
+          element={
+            <ProtectedRoutes role="admin">
+              <AdminSettings />
             </ProtectedRoutes>
           }
         />

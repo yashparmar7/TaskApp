@@ -7,7 +7,7 @@ const Navbar = () => {
   const [showUserCard, setShowUserCard] = useState(false);
   const navigate = useNavigate();
 
-    let user = { username: "", email: "" };
+  let user = { username: "", email: "" };
   try {
     const storedUser = localStorage.getItem("user");
     if (storedUser) {
@@ -32,7 +32,7 @@ const Navbar = () => {
   return (
     <nav className="shadow-lg sticky top-0 z-30 h-18 flex items-center bg-white">
       <div className="container mx-auto px-4 sm:px-6 lg:px-8 flex justify-between items-center w-full">
-        <p className="text-3xl text-gray-600 font-bold">
+        <p className="text-3xl text-gray-600 font-extrabold cursor-pointer">
           {user.role === "admin" ? "Admin Dashboard" : "TaskApp"}
         </p>
 

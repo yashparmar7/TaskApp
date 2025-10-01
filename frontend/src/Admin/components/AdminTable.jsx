@@ -75,7 +75,6 @@ const AdminTable = ({
                           onChange={(e) =>
                             setEditData({
                               ...editData,
-
                               user: {
                                 _id: e.target.value,
                                 username: getUsernameById(e.target.value),
@@ -84,9 +83,8 @@ const AdminTable = ({
                           }
                           className="w-full p-2 border rounded"
                         >
-                          <option value="">Select User</option>
-                          {usersList.map((u) => (
-                            <option key={u._id} value={u._id}>
+                          {usersList.map((u, index) => (
+                            <option key={`${u._id}-${index}`} value={u._id}>
                               {u.username}
                             </option>
                           ))}
