@@ -87,11 +87,9 @@ const getAllTasks = async (req, res) => {
     limit = parseInt(limit) || 10;
     const skip = (page - 1) * limit;
 
-    let query = { isDeleted: { $ne: true } };
+    let query = {};
     if (search) {
       query = {
-        user: req.user._id,
-        isDeleted: { $ne: true },
         $or: [
           { title: { $regex: search, $options: "i" } },
           { description: { $regex: search, $options: "i" } },
@@ -123,11 +121,12 @@ const getAllTasks = async (req, res) => {
 // Update task
 const updateTask = async (req, res) => {
   const { id } = req.params;
-  const { title, description, status } = req.body;
+  const { title, description, status, user } = req.body;
+
   try {
     const updatedTask = await Task.findByIdAndUpdate(
       id,
-      { title, description, status },
+      { title, description, status, user },
       { new: true }
     ).populate("user", "username email");
 
@@ -135,9 +134,10 @@ const updateTask = async (req, res) => {
       return res.status(404).json({ error: "Task not found" });
     }
 
-    res
-      .status(200)
-      .json({ message: "Task updated successfully", task: updatedTask });
+    res.status(200).json({
+      message: "Task updated successfully",
+      task: updatedTask,
+    });
   } catch (err) {
     res.status(500).json({ error: err.message });
   }

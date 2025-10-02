@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useState, useCallback } from "react";
 import Navbar from "../components/Navbar";
 import Sidebar from "./components/Sidebar";
 import AdminTable from "./components/AdminTable";
@@ -14,14 +14,8 @@ const AdminTask = () => {
   const [search, setSearch] = useState("");
   const [cache, setCache] = useState({});
 
-  useEffect(() => {
-    fetchTasks();
-  }, [search, page, limit]);
-
-  const fetchTasks = async () => {
+  const fetchTasks = useCallback(async () => {
     const cacheKey = `${page}-${limit}-${search}`;
-
-    console.log(cacheKey);
 
     if (cache[cacheKey]) {
       setTasks(cache[cacheKey].tasks);
@@ -38,8 +32,6 @@ const AdminTask = () => {
         ? response.data.tasks
         : [];
 
-      // console.log(fetchedTasks);
-
       setTasks(fetchedTasks);
       setTotalPages(response.data.totalPages || 1);
 
@@ -52,40 +44,63 @@ const AdminTask = () => {
       }));
     } catch (error) {
       console.error("Error fetching tasks:", error);
+      toast.error(error.response?.data?.message || "Failed to fetch tasks");
       setTasks([]);
     }
-  };
+  }, [page, limit, search, cache]);
 
-  const handleSearch = (query) => {
-    setSearch(query);
-  };
+  useEffect(() => {
+    fetchTasks();
+  }, [fetchTasks]);
+
   useEffect(() => {
     setPage(1);
   }, [search]);
 
+  const handleSearch = (query) => {
+    setSearch(query);
+  };
+
   const handleEditTask = async (updatedTask) => {
     try {
       await axiosInstance.put(`/tasks/${updatedTask._id}`, updatedTask);
-      fetchTasks();
+
+      const cacheKey = `${page}-${limit}-${search}`;
+      setCache((prev) => {
+        const newCache = { ...prev };
+        delete newCache[cacheKey];
+        return newCache;
+      });
+
       toast.success("Task updated successfully");
+      fetchTasks();
     } catch (error) {
       console.error("Error updating task:", error);
-      toast.error("Task Update Failed");
+      toast.error(error.response?.data?.message || "Task update failed");
     }
   };
 
   const handleDeleteTask = async (taskId) => {
     try {
       await axiosInstance.delete(`/tasks/${taskId}`);
+
+      const cacheKey = `${page}-${limit}-${search}`;
+      setCache((prev) => {
+        const newCache = { ...prev };
+        delete newCache[cacheKey];
+        return newCache;
+      });
+
       if (tasks.length === 1 && page > 1) {
         setPage((prev) => prev - 1);
       } else {
         fetchTasks();
       }
+
       toast.success("Task deleted successfully");
     } catch (error) {
       console.error("Error deleting task:", error);
-      toast.error("Failed to delete task");
+      toast.error(error.response?.data?.message || "Failed to delete task");
     }
   };
 
@@ -99,6 +114,10 @@ const AdminTask = () => {
       render: (task) => task.user?.username || "N/A",
     },
   ];
+
+  const uniqueUsers = Array.from(
+    new Map(tasks.map((t) => [t.user?._id, t.user])).values()
+  );
 
   return (
     <div className="flex flex-col min-h-screen">
@@ -123,7 +142,7 @@ const AdminTask = () => {
             setLimit={setLimit}
             onEdit={handleEditTask}
             onDelete={handleDeleteTask}
-            usersList={tasks.map((task) => task.user)} 
+            usersList={uniqueUsers}
           />
         </main>
       </div>

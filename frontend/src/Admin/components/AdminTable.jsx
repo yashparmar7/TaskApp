@@ -19,12 +19,25 @@ const AdminTable = ({
 
   const handleEditClick = (item) => {
     setEditingId(item._id);
-    setEditData({ ...item });
+    setEditData({ ...item, user: item.user?._id || "" });
   };
 
-  const handleSave = () => {
-    onEdit(editData);
-    setEditingId(null);
+  const handleSave = async () => {
+    if (!editData || !editData._id) return;
+
+    const payload = {
+      ...editData,
+      user: editData.user,
+    };
+
+    try {
+      await onEdit(payload);
+    } catch (error) {
+      console.error("Update failed:", error);
+    } finally {
+      setEditingId(null);
+      setEditData({});
+    }
   };
 
   const handleCancel = () => {
@@ -34,11 +47,6 @@ const AdminTable = ({
 
   const handleInputChange = (e, field) => {
     setEditData({ ...editData, [field]: e.target.value });
-  };
-
-  const getUsernameById = (id) => {
-    const user = usersList.find((u) => u._id === id);
-    return user ? user.username : "N/A";
   };
 
   useEffect(() => {
@@ -55,11 +63,11 @@ const AdminTable = ({
         <thead className="bg-gray-500 text-gray-300">
           <tr>
             {columns.map((col) => (
-              <th key={col.key} className="px-5 py-4 border">
+              <th key={col.key} className="px-5 py-4 border text-left">
                 {col.label}
               </th>
             ))}
-            <th className="px-5 py-4 border">Actions</th>
+            <th className="px-5 py-4 border text-center">Actions</th>
           </tr>
         </thead>
         <tbody>
@@ -71,20 +79,15 @@ const AdminTable = ({
                     {editingId === item._id ? (
                       col.key === "user" ? (
                         <select
-                          value={editData.user?._id || ""}
+                          value={editData.user || ""}
                           onChange={(e) =>
-                            setEditData({
-                              ...editData,
-                              user: {
-                                _id: e.target.value,
-                                username: getUsernameById(e.target.value),
-                              },
-                            })
+                            setEditData({ ...editData, user: e.target.value })
                           }
                           className="w-full p-2 border rounded"
                         >
-                          {usersList.map((u, index) => (
-                            <option key={`${u._id}-${index}`} value={u._id}>
+                          <option value="">Select User</option>
+                          {usersList.map((u) => (
+                            <option key={u._id} value={u._id}>
                               {u.username}
                             </option>
                           ))}
@@ -106,18 +109,18 @@ const AdminTable = ({
                     )}
                   </td>
                 ))}
-                <td className="border-none px-4 py-2 flex justify-evenly">
+                <td className="px-4 py-2 flex justify-evenly">
                   {editingId === item._id ? (
                     <>
                       <button
                         onClick={handleSave}
-                        className="bg-gray-500 text-white px-5 py-1 rounded mr-2"
+                        className="bg-gray-500 text-white px-5 py-1 rounded mr-2 hover:bg-gray-600"
                       >
                         Save
                       </button>
                       <button
                         onClick={handleCancel}
-                        className="bg-white text-gray-500 border border-gray-500 px-4 py-1 rounded"
+                        className="bg-white text-gray-500 border border-gray-500 px-4 py-1 rounded hover:bg-gray-100"
                       >
                         Cancel
                       </button>
@@ -125,10 +128,10 @@ const AdminTable = ({
                   ) : (
                     <>
                       <button onClick={() => handleEditClick(item)}>
-                        <PencilLine className="cursor-pointer bg-blue-500 text-white p-1 rounded" />
+                        <PencilLine className="cursor-pointer bg-blue-500 text-white p-1 rounded hover:bg-blue-600" />
                       </button>
                       <button onClick={() => onDelete(item._id)}>
-                        <Trash2 className="cursor-pointer bg-red-500 text-white p-1 rounded" />
+                        <Trash2 className="cursor-pointer bg-red-500 text-white p-1 rounded hover:bg-red-600" />
                       </button>
                     </>
                   )}
@@ -148,14 +151,14 @@ const AdminTable = ({
         </tbody>
       </table>
 
+      {/* Pagination */}
       <div className="flex flex-col sm:flex-row justify-between items-center mt-4 gap-2">
-        {/* Rows per page selector */}
         <div className="flex items-center gap-2">
           <label className="font-medium text-gray-700">Rows per page:</label>
           <select
             value={limit}
             onChange={(e) => setLimit(Number(e.target.value))}
-            className="border border-gray-300 rounded px-2 py-1 focus:outline-none focus:ring-2 focus:ring-gray-400"
+            className="border border-gray-300 rounded px-2 py-1"
           >
             <option value={5}>5</option>
             <option value={10}>10</option>
@@ -164,7 +167,6 @@ const AdminTable = ({
           </select>
         </div>
 
-        {/* Pagination controls */}
         <div className="flex items-center gap-3">
           <button
             onClick={() => setPage((prev) => Math.max(prev - 1, 1))}

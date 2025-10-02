@@ -17,7 +17,6 @@ export const taskAPI = axios.create({
   },
 });
 
-// Add request interceptor to taskAPI
 taskAPI.interceptors.request.use(
   (config) => {
     const token = localStorage.getItem("token");
@@ -40,7 +39,6 @@ const axiosInstance = axios.create({
   },
 });
 
-// Add request interceptor to axiosInstance
 axiosInstance.interceptors.request.use(
   (config) => {
     const token = localStorage.getItem("token");
