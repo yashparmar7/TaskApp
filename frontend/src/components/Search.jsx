@@ -9,7 +9,7 @@ const Search = ({ onSearch }) => {
     if (debounceTimeout.current) clearTimeout(debounceTimeout.current);
     debounceTimeout.current = setTimeout(() => {
       onSearch(query);
-    }, 300);
+    }, 500);
     return () => {
       if (debounceTimeout.current) clearTimeout(debounceTimeout.current);
     };

@@ -30,33 +30,46 @@ const Navbar = () => {
   };
 
   return (
-    <nav className="shadow-lg sticky top-0 z-30 h-18 flex items-center bg-white">
-      <div className="container mx-auto px-4 sm:px-6 lg:px-8 flex justify-between items-center w-full">
-        <p className="text-3xl text-gray-600 font-extrabold cursor-pointer">
-          {user.role === "admin" ? "Admin Dashboard" : "TaskApp"}
-        </p>
+    <nav className="sticky top-0 z-30 bg-white shadow-lg">
+      <div className="container mx-auto px-4 sm:px-6 lg:px-8">
+        <div className="flex justify-between items-center h-16">
+          <h1 className="text-2xl sm:text-3xl font-extrabold text-gray-800">
+            {user.role === "admin" ? "Admin Dashboard" : "TaskApp"}
+          </h1>
 
-        <div className="relative flex gap-2">
-          <button
-            className="flex items-center justify-center gap-2 bg-gray-600 hover:bg-gray-700 transition text-white p-3 rounded-2xl"
-            onClick={handleUserToggle}
-          >
-            <User2 className="w-5 h-5" />
-          </button>
+          <div className="flex items-center gap-2">
+            <div className="relative">
+              {user.role === "user" && (
+                <button
+                  className="flex items-center justify-center bg-gray-600 hover:bg-gray-700 active:bg-gray-800 transition-colors text-white p-3 rounded-lg focus:outline-none focus:ring-2 focus:ring-gray-500 focus:ring-offset-2"
+                  onClick={handleUserToggle}
+                  aria-label="User menu"
+                  aria-expanded={showUserCard}
+                >
+                  <User2 className="w-5 h-5" />
+                </button>
+              )}
 
-          {showUserCard && (
-            <div className="absolute top-14 right-0 w-52 bg-white shadow-lg rounded-xl p-4 border border-gray-200">
-              <p className="font-semibold text-gray-700">{user.username}</p>
-              <p className="text-gray-500 text-sm">{user.email}</p>
+              {showUserCard && (
+                <div className="absolute top-full mt-2 right-0 w-56 bg-white shadow-xl rounded-lg p-4 border border-gray-200 animate-in fade-in slide-in-from-top-2 duration-200">
+                  <p className="font-semibold text-gray-800 truncate">
+                    {user.username}
+                  </p>
+                  <p className="text-gray-600 text-sm truncate mt-1">
+                    {user.email}
+                  </p>
+                </div>
+              )}
             </div>
-          )}
 
-          <button
-            className="flex items-center justify-center gap-2 bg-gray-600 hover:bg-gray-700 transition text-white p-3 rounded-2xl"
-            onClick={handleLogout}
-          >
-            <LogOut className="w-5 h-5" />
-          </button>
+            <button
+              className="flex items-center justify-center bg-gray-600 hover:bg-gray-700 active:bg-gray-800 transition-colors text-white p-3 rounded-lg focus:outline-none focus:ring-2 focus:ring-gray-500 focus:ring-offset-2"
+              onClick={handleLogout}
+              aria-label="Logout"
+            >
+              <LogOut className="w-5 h-5" />
+            </button>
+          </div>
         </div>
       </div>
     </nav>

@@ -7,7 +7,7 @@ const Sidebar = () => {
     { label: "Dashboard", path: "/admin" },
     { label: "Tasks", path: "/admin-tasks" },
     { label: "Users", path: "/admin-users" },
-    { label: "Settings", path: "/admin-settings" },
+    { label: "Profile", path: "/admin-profile" },
   ];
 
   return (
