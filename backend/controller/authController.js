@@ -1,8 +1,9 @@
 const User = require("../model/User.js");
 const bcrypt = require("bcrypt");
 const jwt = require("jsonwebtoken");
+const asyncHandler = require("express-async-handler");
 
-const handleSignup = async (req, res) => {
+const handleSignup = asyncHandler(async (req, res) => {
   const { username, email, password } = req.body;
 
   const userExists = await User.findOne({ email });
@@ -32,40 +33,34 @@ const handleSignup = async (req, res) => {
       role: newUser.role,
     },
   });
-};
-
-const handleLogin = async (req, res) => {
+});
+const handleLogin = asyncHandler(async (req, res) => {
   const { email, password } = req.body;
 
-  try {
-    const user = await User.findOne({ email });
-    if (!user) {
-      return res.status(401).json({ error: "Invalid email or password" });
-    }
-
-    const passwordMatch = await bcrypt.compare(password, user.password);
-
-    if (!passwordMatch) {
-      return res.status(401).json({ error: "Password does not match" });
-    }
-    const token = jwt.sign(
-      { _id: user._id, email: user.email, role: user.role },
-      process.env.JWT_SECRET,
-      { expiresIn: "1d" }
-    );
-    res.status(200).json({
-      message: "Login successful",
-      token,
-      user: {
-        _id: user._id,
-        username: user.username,
-        email: user.email,
-        role: user.role,
-      },
-    });
-  } catch (err) {
-    res.status(500).json({ error: err.message });
+  const user = await User.findOne({ email });
+  if (!user) {
+    return res.status(401).json({ error: "Invalid email or password" });
   }
-};
 
+  const passwordMatch = await bcrypt.compare(password, user.password);
+
+  if (!passwordMatch) {
+    return res.status(401).json({ error: "Password does not match" });
+  }
+  const token = jwt.sign(
+    { _id: user._id, email: user.email, role: user.role },
+    process.env.JWT_SECRET,
+    { expiresIn: "1d" }
+  );
+  res.status(200).json({
+    message: "Login successful",
+    token,
+    user: {
+      _id: user._id,
+      username: user.username,
+      email: user.email,
+      role: user.role,
+    },
+  });
+});
 module.exports = { handleSignup, handleLogin };
