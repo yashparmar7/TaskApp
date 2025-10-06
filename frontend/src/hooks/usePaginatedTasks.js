@@ -7,14 +7,14 @@ const usePaginatedTasks = (page, limit, search = "") => {
   const [cache, setCache] = useState({});
 
   const fetchTasks = useCallback(
-    async (force = false) => {
+    async (isCatch = false) => {
       try {
         const token = localStorage.getItem("token");
         if (!token) return;
 
         const cacheKey = `${page}-${limit}-${search}`;
 
-        if (!force && cache[cacheKey]) {
+        if (!isCatch && cache[cacheKey]) {
           setTasks(cache[cacheKey].tasks);
           setTotalPages(cache[cacheKey].totalPages);
           return;
